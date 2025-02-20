@@ -21,6 +21,8 @@ public class CarCreationBindingModel {
     private Double litersPerHundredKilometers;
     private Double pricePerDay;
     private Integer count;
+    private boolean isForSale;
+    private Double price;
 
     public CarCreationBindingModel() {
     }
@@ -112,6 +114,24 @@ public class CarCreationBindingModel {
 
     public void setPricePerDay(Double pricePerDay) {
         this.pricePerDay = pricePerDay;
+    }
+
+    @NotNull
+    public boolean isForSale() {
+        return isForSale;
+    }
+
+    public void setForSale(boolean forSale) {
+        isForSale = forSale;
+    }
+
+    @NotNull
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     @NotNull

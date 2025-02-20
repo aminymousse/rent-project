@@ -90,6 +90,8 @@ public class CarServiceImpl implements CarService {
         car.setDescription(model.getDescription());
         car.setLitersPerHundredKilometers(model.getLitersPerHundredKilometers());
         car.setPricePerDay(model.getPricePerDay());
+        car.setForSale(model.isForSale());
+        car.setPrice(model.getPrice());
 
         return this.modelMapper.map(this.carRepository.saveAndFlush(car), CarViewModel.class);
     }

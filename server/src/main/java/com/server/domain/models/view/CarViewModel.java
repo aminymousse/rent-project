@@ -14,6 +14,8 @@ public class CarViewModel {
     private Double pricePerDay;
     private Integer count;
     private boolean isRented;
+    private boolean isForSale;
+    private Double price;
 
     public CarViewModel() {
     }
@@ -113,4 +115,21 @@ public class CarViewModel {
     public void setRented(boolean rented) {
         isRented = rented;
     }
+
+    public boolean isForSale() {
+        return isForSale;
+    }
+
+    public void setForSale(boolean forSale) {
+        isForSale = forSale;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
 }

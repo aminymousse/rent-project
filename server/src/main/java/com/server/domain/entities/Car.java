@@ -20,6 +20,8 @@ public class Car extends BaseEntity{
     private Double pricePerDay;
     private Integer count;
     private Set<Rent> activeRents;
+    private boolean isForSale;
+    private Double price;
 
     public Car() {
         this.activeRents = new HashSet<>();
@@ -123,6 +125,24 @@ public class Car extends BaseEntity{
 
     public void setActiveRents(Set<Rent> activeRents) {
         this.activeRents = activeRents;
+    }
+
+    @Column(nullable = false)
+    public boolean isForSale() {
+        return isForSale;
+    }
+
+    public void setForSale(boolean forSale) {
+        isForSale = forSale;
+    }
+
+    @Column(nullable = false)
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
     public boolean isAvailable(LocalDate startDate, LocalDate endDate){
