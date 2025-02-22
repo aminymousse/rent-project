@@ -62,7 +62,7 @@ class CarDetails extends Component {
                     <CarInformation data={this.state}/>
                 </div>
                 {
-                    user.role === 'ADMIN' ? (
+                    user.role === 'ADMIN' && !this.state.owner ? (
                         <Fragment>
                             <hr/>
                             <div className="row justify-content-center my-3">

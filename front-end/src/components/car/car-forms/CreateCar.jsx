@@ -1,12 +1,24 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import toastr from "toastr";
 import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
+import {
+  Container,
+  Paper,
+  Typography,
+  Grid,
+  TextField,
+  FormControlLabel,
+  Switch,
+  Button,
+  Box,
+  CircularProgress,
+} from "@mui/material";
+import { Save, Cancel, DirectionsCar } from "@mui/icons-material";
 
 import { carService } from "../../../services";
 import { createCarValidation } from "../../../util/validation/formValidator";
 import { createCarHandler } from "../../../util/validation/formErrorHandler";
-import Input from "../../common/tools/Input";
 
 class CreateCar extends Component {
   constructor(props) {
@@ -24,6 +36,7 @@ class CreateCar extends Component {
       pricePerDay: "",
       forSale: false,
       price: "",
+      loading: false,
     };
 
     this.onSubmit = this.onSubmit.bind(this);
@@ -38,8 +51,12 @@ class CreateCar extends Component {
   }
 
   onCheckboxChange(e) {
+    const { name, checked } = e.target;
     this.setState({
-      [e.target.name]: e.target.checked,
+      [name]: checked,
+      // Clear the irrelevant price field when switching
+      pricePerDay: checked ? null : this.state.pricePerDay,
+      price: checked ? this.state.price : null,
     });
   }
 
@@ -71,16 +88,29 @@ class CreateCar extends Component {
         description,
         imageUrl,
         trunkCapacity,
-        pricePerDay,
+        forSale ? null : pricePerDay,
         forSale,
-        price
+        forSale ? price : null
       )
     ) {
       return;
     }
 
+    this.setState({ loading: true });
+
+    // Parse all number values before sending
     const carData = {
-      ...this.state,
+      brand,
+      model,
+      count: count.toString(),
+      seats: seats.toString(),
+      year: year.toString(),
+      trunkCapacity: trunkCapacity.toString(),
+      description,
+      imageUrl,
+      litersPerHundredKilometers: litersPerHundredKilometers.toString(),
+      pricePerDay: forSale ? null : Number.parseFloat(pricePerDay),
+      forSale,
       price: forSale ? Number.parseFloat(price) : null,
     };
 
@@ -89,6 +119,7 @@ class CreateCar extends Component {
       .then((res) => {
         if (res.success === false) {
           toastr.error(res.message);
+          this.props.history.push("/cars/all");
         } else {
           toastr.success("Successful creation");
           this.props.history.push("/cars/all");
@@ -97,6 +128,9 @@ class CreateCar extends Component {
       .catch((e) => {
         console.log(e);
         toastr.error("An error occurred while creating the car");
+      })
+      .finally(() => {
+        this.setState({ loading: false });
       });
   }
 
@@ -114,6 +148,7 @@ class CreateCar extends Component {
       pricePerDay,
       forSale,
       price,
+      loading,
     } = this.state;
 
     const validation = createCarValidation(
@@ -132,159 +167,233 @@ class CreateCar extends Component {
     );
 
     return (
-      <div className="container">
-        <div className="row space-top justify-content-center">
-          <div className="col-md-4 text-center">
-            <h1>Add a car</h1>
-          </div>
-        </div>
-        <hr />
-        <div className="row space-top justify-content-center">
-          <div className="col-md-8">
-            <form onSubmit={this.onSubmit}>
-              <div className="row justify-content-around">
-                <Input
-                  onChange={this.onChange}
-                  name="brand"
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Box sx={{ mb: 4, textAlign: "center" }}>
+            <Typography
+              variant="h4"
+              component="h1"
+              gutterBottom
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
+              <DirectionsCar /> Add New Car
+            </Typography>
+          </Box>
+
+          <form onSubmit={this.onSubmit}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
                   label="Brand"
-                  type="text"
+                  name="brand"
                   value={brand}
-                  valid={validation.validBrand}
-                />
-                <Input
                   onChange={this.onChange}
-                  name="model"
+                  error={!validation.validBrand}
+                  helperText={
+                    !validation.validBrand && "Please enter a valid brand name"
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
                   label="Model"
-                  type="text"
+                  name="model"
                   value={model}
-                  valid={validation.validModel}
-                />
-              </div>
-              <div className="row justify-content-around">
-                <Input
                   onChange={this.onChange}
-                  name="count"
+                  error={!validation.validModel}
+                  helperText={
+                    !validation.validModel && "Please enter a valid model name"
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
                   label="Count"
+                  name="count"
                   type="number"
                   value={count}
-                  valid={validation.validCount}
-                />
-                <Input
                   onChange={this.onChange}
-                  name="seats"
+                  error={!validation.validCount}
+                  helperText={
+                    !validation.validCount && "Please enter a valid count"
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
                   label="Seats"
+                  name="seats"
                   type="number"
                   value={seats}
-                  valid={validation.validSeats}
-                />
-                <Input
                   onChange={this.onChange}
-                  name="year"
+                  error={!validation.validSeats}
+                  helperText={
+                    !validation.validSeats &&
+                    "Please enter a valid number of seats"
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
                   label="Year"
+                  name="year"
                   type="number"
                   value={year}
-                  valid={validation.validYear}
-                />
-              </div>
-              <div className="row justify-content-around">
-                <Input
                   onChange={this.onChange}
-                  name="imageUrl"
+                  error={!validation.validYear}
+                  helperText={
+                    !validation.validYear && "Please enter a valid year"
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
                   label="Image URL"
-                  type="text"
+                  name="imageUrl"
                   value={imageUrl}
-                  valid={validation.validImage}
-                />
-                <Input
                   onChange={this.onChange}
+                  error={!validation.validImage}
+                  helperText={
+                    !validation.validImage && "Please enter a valid image URL"
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Trunk Capacity (L)"
                   name="trunkCapacity"
-                  label="Trunk Capacity"
                   type="number"
                   value={trunkCapacity}
-                  valid={validation.validTrunkCapacity}
-                />
-              </div>
-              <div className="row justify-content-around">
-                <Input
                   onChange={this.onChange}
-                  name="litersPerHundredKilometers"
-                  label="Fuel consumption(l/100km)"
-                  type="number"
-                  step="0.01"
-                  value={litersPerHundredKilometers}
-                  valid={validation.validFuelExpense}
-                />
-                <Input
-                  onChange={this.onChange}
-                  name="pricePerDay"
-                  label="Price per day"
-                  type="number"
-                  step="0.01"
-                  value={pricePerDay}
-                  valid={validation.validPrice}
-                />
-              </div>
-              <div>
-                <label htmlFor="description" className="form-control-label">
-                  Description
-                </label>
-                <textarea
-                  onChange={this.onChange}
-                  className={
-                    validation.validDescription
-                      ? "is-valid form-control mb-3"
-                      : "is-invalid form-control mb-3"
+                  error={!validation.validTrunkCapacity}
+                  helperText={
+                    !validation.validTrunkCapacity &&
+                    "Please enter a valid trunk capacity"
                   }
-                  name="description"
-                  id="description"
-                  value={description}
                 />
-              </div>
-              <div className="form-check mb-3">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="forSale"
-                  name="forSale"
-                  checked={forSale}
-                  onChange={this.onCheckboxChange}
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  label="Fuel Consumption (L/100km)"
+                  name="litersPerHundredKilometers"
+                  type="number"
+                  inputProps={{ step: "0.01" }}
+                  value={litersPerHundredKilometers}
+                  onChange={this.onChange}
+                  error={!validation.validFuelExpense}
+                  helperText={
+                    !validation.validFuelExpense &&
+                    "Please enter a valid fuel consumption"
+                  }
                 />
-                <label className="form-check-label" htmlFor="forSale">
-                  For Sale
-                </label>
-              </div>
-              {forSale && (
-                <div className="row justify-content-around">
-                  <Input
-                    onChange={this.onChange}
-                    name="price"
-                    label="Sale Price"
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={forSale}
+                      onChange={this.onCheckboxChange}
+                      name="forSale"
+                    />
+                  }
+                  label="For Sale"
+                />
+              </Grid>
+              {!forSale ? (
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Price per Day"
+                    name="pricePerDay"
                     type="number"
-                    step="0.01"
-                    value={price}
-                    valid={validation.validSalePrice}
+                    inputProps={{ step: "0.01" }}
+                    value={pricePerDay || ""}
+                    onChange={this.onChange}
+                    error={!validation.validPrice}
+                    helperText={
+                      !validation.validPrice &&
+                      "Please enter a valid daily price"
+                    }
                   />
-                </div>
+                </Grid>
+              ) : (
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    required
+                    label="Sale Price"
+                    name="price"
+                    type="number"
+                    inputProps={{ step: "0.01" }}
+                    value={price || ""}
+                    onChange={this.onChange}
+                    error={!validation.validSalePrice}
+                    helperText={
+                      !validation.validSalePrice &&
+                      "Please enter a valid sale price"
+                    }
+                  />
+                </Grid>
               )}
-              <hr />
-              <div className="row justify-content-center my-3">
-                <button
-                  type="submit"
-                  className="btn btn-info mx-3 text-white w-25"
-                >
-                  Add
-                </button>
-                <Link
-                  to="/cars/all"
-                  className="btn btn-danger mx-3 text-white w-25"
-                >
-                  Cancel
-                </Link>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Description"
+                  name="description"
+                  multiline
+                  rows={4}
+                  value={description}
+                  onChange={this.onChange}
+                  error={!validation.validDescription}
+                  helperText={
+                    !validation.validDescription &&
+                    "Please enter a valid description"
+                  }
+                />
+              </Grid>
+            </Grid>
+
+            <Box
+              sx={{ mt: 4, display: "flex", justifyContent: "center", gap: 2 }}
+            >
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+                disabled={loading}
+                startIcon={loading ? <CircularProgress size={20} /> : <Save />}
+              >
+                {loading ? "Creating..." : "Create Car"}
+              </Button>
+              <Button
+                component={Link}
+                to="/cars/all"
+                variant="outlined"
+                color="error"
+                size="large"
+                startIcon={<Cancel />}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </form>
+        </Paper>
+      </Container>
     );
   }
 }

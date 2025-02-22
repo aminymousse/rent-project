@@ -7,31 +7,40 @@ export default {
     editCar,
     createCar,
     getAllCars,
-    checkAvailability
-
+    checkAvailability,
+    purchaseCar,
+    getMyPurchasedCars
 }
 
-function findAvailableCars(pageString, searchString,dates){
-    return fetcher.post(config.SERVER_PATH + "/cars/available"+ pageString +  searchString, dates)
+function findAvailableCars(pageString, searchString, dates) {
+    return fetcher.post(config.SERVER_PATH + "/cars/available" + pageString + searchString, dates)
 }
 
-function getCarById(id){
+function getCarById(id) {
     return fetcher.get(config.SERVER_PATH + '/cars/' + id)
 }
 
-function editCar(id, body){
+function editCar(id, body) {
     return fetcher.post(config.SERVER_PATH + "/cars/edit/" + id, body)
 }
 
-function createCar(body){
+function createCar(body) {
     return fetcher.post(config.SERVER_PATH + "/cars/create", body)
 
 }
 
-function getAllCars(pageString, searchString){
+function getAllCars(pageString, searchString) {
     return fetcher.get(config.SERVER_PATH + '/cars/all' + pageString + searchString)
 }
 
-function checkAvailability(id ,startDate, endDate){
-    return fetcher.post(config.SERVER_PATH + '/cars/check/' +id, {startDate,endDate})
+function checkAvailability(id, startDate, endDate) {
+    return fetcher.post(config.SERVER_PATH + '/cars/check/' + id, { startDate, endDate })
+}
+
+function purchaseCar(id, username) {
+    return fetcher.post(config.SERVER_PATH + '/cars/purchase/' + id, { username })
+}
+
+function getMyPurchasedCars(pageString, searchString, username) {
+    return fetcher.get(config.SERVER_PATH + `/cars/my-cars/${pageString}`)
 }

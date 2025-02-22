@@ -10,6 +10,7 @@
     "@mui/material": "^6.4.5",
     "bootstrap": "^5.3.3",
     "jwt-decode": "^2.2.0",
+    "lucide-react": "^0.475.0",
     "react": "^16.8.3",
     "react-bootstrap": "^1.0.0-beta.5",
     "react-dom": "^16.8.3",

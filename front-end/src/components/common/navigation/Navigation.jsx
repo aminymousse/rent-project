@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { NavLink } from "react-router-dom"
-import { UserConsumer } from "../../../context/UserContext"
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { UserConsumer } from "../../../context/UserContext";
 import {
   AppBar,
   Box,
@@ -18,7 +18,7 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
-} from "@mui/material"
+} from "@mui/material";
 import {
   Menu as MenuIcon,
   DirectionsCar,
@@ -28,17 +28,18 @@ import {
   Person,
   Login,
   Logout,
-} from "@mui/icons-material"
+  Garage,
+} from "@mui/icons-material";
 
 const Navigation = (props) => {
-  const { user } = props
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const { user } = props;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen)
-  }
+    setMobileOpen(!mobileOpen);
+  };
 
   const navItems = [
     { to: "/cars/all", label: "Car Fleet", icon: <DirectionsCar /> },
@@ -46,18 +47,36 @@ const Navigation = (props) => {
       ? user.role === "ADMIN"
         ? [
             { to: "/cars/create", label: "Add Car", icon: <Add /> },
-            { to: "/rents/pending", label: "Pending Rents", icon: <Schedule /> },
-            { to: "/rents/active", label: "Active Rents", icon: <ShoppingCart /> },
+            {
+              to: "/rents/pending",
+              label: "Pending Rents",
+              icon: <Schedule />,
+            },
+            {
+              to: "/rents/active",
+              label: "Active Rents",
+              icon: <ShoppingCart />,
+            },
           ]
         : [
-            { to: "/cars/available", label: "Available Cars", icon: <DirectionsCar /> },
-            { to: `/sales/all/${user.username}`, label: "My Purchases", icon: <ShoppingCart /> },
+            {
+              to: "/cars/available",
+              label: "Available Cars",
+              icon: <DirectionsCar />,
+            },
+            { to: "/cars/my-cars", label: "My Cars", icon: <Garage /> },
+
+            {
+              to: `/sales/all/${user.username}`,
+              label: "My Rents",
+              icon: <ShoppingCart />,
+            },
           ]
       : [
           { to: "/register", label: "Register", icon: <Person /> },
           { to: "/login", label: "Login", icon: <Login /> },
         ]),
-  ]
+  ];
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
@@ -73,11 +92,16 @@ const Navigation = (props) => {
               to={item.to}
               sx={{
                 textAlign: "left",
+                textDecoration: "none",
+                color: "black",
                 "&.active": {
-                  bgcolor: "primary.light",
+                  backgroundColor: "primary.main",
+                  color: "white",
                   "& .MuiListItemText-primary": {
-                    color: "primary.main",
-                    fontWeight: "bold",
+                    color: "white",
+                  },
+                  "& svg": {
+                    color: "white",
                   },
                 },
               }}
@@ -91,7 +115,10 @@ const Navigation = (props) => {
           <>
             <Divider sx={{ my: 1 }} />
             <ListItem>
-              <ListItemText primary={`Hello, ${user.username}!`} sx={{ textAlign: "center" }} />
+              <ListItemText
+                primary={`Hello, ${user.username}!`}
+                sx={{ textAlign: "center" }}
+              />
             </ListItem>
             <ListItem disablePadding>
               <ListItemButton
@@ -112,7 +139,7 @@ const Navigation = (props) => {
         )}
       </List>
     </Box>
-  )
+  );
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -157,9 +184,12 @@ const Navigation = (props) => {
                   to={item.to}
                   startIcon={item.icon}
                   sx={{
+                    color: "black", // Add default black color
+                    "& svg": { color: "black" }, // Make icons black too
                     "&.active": {
                       bgcolor: "primary.light",
-                      color: "primary.main",
+                      color: "white",
+                      "& svg": { color: "white" }, // Keep active icons matching text
                     },
                   }}
                 >
@@ -171,8 +201,15 @@ const Navigation = (props) => {
 
           {!isMobile && user.isLoggedIn && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Typography variant="subtitle2">Hello, {user.username}!</Typography>
-              <Button component={NavLink} to="/logout" color="error" startIcon={<Logout />}>
+              <Typography variant="subtitle2">
+                Hello, {user.username}!
+              </Typography>
+              <Button
+                component={NavLink}
+                to="/logout"
+                color="error"
+                startIcon={<Logout />}
+              >
                 Logout
               </Button>
             </Box>
@@ -196,12 +233,15 @@ const Navigation = (props) => {
         {drawer}
       </Drawer>
     </Box>
-  )
-}
+  );
+};
 
 const NavigationWithContext = (props) => {
-  return <UserConsumer>{({ user }) => <Navigation {...props} user={user} />}</UserConsumer>
-}
+  return (
+    <UserConsumer>
+      {({ user }) => <Navigation {...props} user={user} />}
+    </UserConsumer>
+  );
+};
 
-export default NavigationWithContext
-
+export default NavigationWithContext;
