@@ -1,30 +1,66 @@
-import React from 'react';
-
+import { TableRow, TableCell, Chip } from "@mui/material";
+import { CheckCircle, Cancel, Schedule } from "@mui/icons-material";
 import util from "../../util/util";
 
-import './Sale.css'
+const Sale = ({ sale }) => {
+  const {
+    rentId,
+    issueDate,
+    carBrand,
+    carModel,
+    startDate,
+    endDate,
+    pricePaid,
+    type,
+  } = sale;
 
-const Sale = (props) => {
-    const {rentId,issueDate, carBrand, carModel, startDate, endDate, pricePaid, type} = props.sale;
+  const getStatusChip = (status) => {
+    switch (status) {
+      case "APPROVED":
+        return (
+          <Chip
+            icon={<CheckCircle />}
+            label="Approved"
+            color="success"
+            size="small"
+            sx={{ fontWeight: "bold" }}
+          />
+        );
+      case "DECLINED":
+        return (
+          <Chip
+            icon={<Cancel />}
+            label="Declined"
+            color="error"
+            size="small"
+            sx={{ fontWeight: "bold" }}
+          />
+        );
+      default:
+        return (
+          <Chip
+            icon={<Schedule />}
+            label="Pending"
+            color="warning"
+            size="small"
+            sx={{ fontWeight: "bold" }}
+          />
+        );
+    }
+  };
 
-    return (
-        <tr>
-            <td className='align-middle sale-row'>{rentId}</td>
-            <td className='align-middle sale-row'>{util.formatDate(issueDate)}</td>
-            <th className='align-middle sale-row'>{carBrand}</th>
-            <th className='align-middle sale-row'>{carModel}</th>
-            <td className='align-middle sale-row'>{util.formatDate(startDate)}</td>
-            <td className='align-middle sale-row'>{util.formatDate(endDate)}</td>
-            <td className='align-middle sale-row'>{pricePaid.toFixed(2)}</td>
-            {
-                type === 'APPROVED' ? <td className='font-weight-bold text-success align-middle sale-row'>{type}</td>
-                    : type === 'DECLINED' ? <td className='font-weight-bold text-danger align-middle sale-row'>{type}</td>
-                            : <td className='font-weight-bold text-warning align-middle sale-row'>{type}</td>
-            }
-
-        </tr>
-    )
-
-}
+  return (
+    <TableRow hover>
+      <TableCell sx={{ fontWeight: "medium" }}>{rentId}</TableCell>
+      <TableCell>{util.formatDate(issueDate)}</TableCell>
+      <TableCell sx={{ fontWeight: "bold" }}>{carBrand}</TableCell>
+      <TableCell sx={{ fontWeight: "bold" }}>{carModel}</TableCell>
+      <TableCell>{util.formatDate(startDate)}</TableCell>
+      <TableCell>{util.formatDate(endDate)}</TableCell>
+      <TableCell>${pricePaid.toFixed(2)}</TableCell>
+      <TableCell>{getStatusChip(type)}</TableCell>
+    </TableRow>
+  );
+};
 
 export default Sale;

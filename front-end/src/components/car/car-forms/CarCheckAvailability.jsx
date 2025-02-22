@@ -1,8 +1,23 @@
-import React, { Component, Fragment } from "react";
-import toastr from "toastr";
+import React, { Component } from "react";
 import { withRouter } from "react-router";
+import {
+  Box,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Stack,
+  CircularProgress,
+} from "@mui/material";
+import {
+  CalendarMonth,
+  CheckCircle,
+  ShoppingCart,
+  Store,
+} from "@mui/icons-material";
+import toastr from "toastr";
 
-import Input from "../../common/tools/Input";
 import { carService } from "../../../services";
 import { DatesConsumer } from "../../../context/DatesContext";
 import { dateValidation } from "../../../util/validation/formValidator";
@@ -18,36 +33,35 @@ class CarCheckAvailability extends Component {
       endDate: util.getCurrentDate(),
       submitted: false,
       available: false,
+      loading: false,
     };
-
-    this.onChange = this.onChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-    this.onReserveClick = this.onReserveClick.bind(this);
   }
 
-  onChange(e) {
+  onChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value,
     });
-  }
+  };
 
-  onReserveClick() {
+  onReserveClick = () => {
     const { startDate, endDate } = this.state;
     this.props.updateDates({ startDate, endDate });
     this.props.history.push("/cars/reserve/" + this.props.id);
-  }
+  };
 
-  onBuyClick(){
-    
-  }
+  onBuyClick = () => {
+    // Implementation for buy functionality
+  };
 
-  onSubmit(e) {
+  onSubmit = (e) => {
     e.preventDefault();
     const { startDate, endDate } = this.state;
 
     if (!dateHandler(startDate, endDate)) {
       return;
     }
+
+    this.setState({ loading: true });
 
     carService
       .checkAvailability(this.props.id, startDate, endDate)
@@ -63,79 +77,124 @@ class CarCheckAvailability extends Component {
       })
       .catch((e) => {
         console.log(e);
+        toastr.error("An error occurred while checking availability");
+      })
+      .finally(() => {
+        this.setState({ loading: false });
       });
-  }
+  };
 
   render() {
-    const { startDate, endDate, submitted, available } = this.state;
+    const { startDate, endDate, submitted, available, loading } = this.state;
     const validation = dateValidation(startDate, endDate);
 
     return (
-      <div className="container col-lg-2 mt-5">
-        <div className="bg-primary rounded shadow justify-content-around h-85">
+      <Box sx={{ mt: 5, width: "100%", maxWidth: 300, mx: "auto" }}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 3,
+            bgcolor: "background.paper",
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" gutterBottom align="center">
+            Check Availability
+          </Typography>
+
           <form onSubmit={this.onSubmit}>
-            <div className="row space-top justify-content-center">
-              <div className="col-lg-10">
-                <Input
-                  type="date"
-                  value={startDate}
-                  name="startDate"
-                  onChange={this.onChange}
-                  valid={validation.validStartDate}
-                />
-                <Input
-                  type="date"
-                  value={endDate}
-                  name="endDate"
-                  onChange={this.onChange}
-                  valid={validation.validEndDate}
-                />
-                <button
-                  type="submit"
-                  className="btn btn-success form-control shadow"
-                >
-                  Check Availability
-                </button>
-              </div>
-            </div>
+            <Stack spacing={3}>
+              <TextField
+                fullWidth
+                type="date"
+                label="Start Date"
+                name="startDate"
+                value={startDate}
+                onChange={this.onChange}
+                error={!validation.validStartDate}
+                helperText={
+                  !validation.validStartDate &&
+                  "Please select a valid start date"
+                }
+                InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  startAdornment: (
+                    <CalendarMonth sx={{ color: "action.active", mr: 1 }} />
+                  ),
+                }}
+              />
+
+              <TextField
+                fullWidth
+                type="date"
+                label="End Date"
+                name="endDate"
+                value={endDate}
+                onChange={this.onChange}
+                error={!validation.validEndDate}
+                helperText={
+                  !validation.validEndDate && "Please select a valid end date"
+                }
+                InputLabelProps={{ shrink: true }}
+                InputProps={{
+                  startAdornment: (
+                    <CalendarMonth sx={{ color: "action.active", mr: 1 }} />
+                  ),
+                }}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                fullWidth
+                disabled={loading}
+                startIcon={
+                  loading ? <CircularProgress size={20} /> : <CheckCircle />
+                }
+              >
+                {loading ? "Checking..." : "Check Availability"}
+              </Button>
+            </Stack>
           </form>
-          {submitted ? (
-            <Fragment>
+
+          {submitted && (
+            <Box sx={{ mt: 3 }}>
               {available ? (
-                <Fragment>
-                  <div className="container bg-success rounded w-75">
-                    <div className="mt-5 text-center text-white rounded">
-                      <h3>Available</h3>
-                    </div>
-                  </div>
-                  <div className="container mt-5 w-85 align-items-center">
-                    <button
-                      className="btn bg-info w-100 shadow text-white btn-outline-light"
-                      onClick={this.onReserveClick}
-                    >
-                      Reserve
-                    </button>
-                    <button
-                      className="btn bg-danger w-100 shadow text-white btn-outline-light"
-                      onClick={this.onReserveClick}
-                    >
-                      Buy
-                    </button>
-                  </div>
-                </Fragment>
+                <Stack spacing={2}>
+                  <Alert
+                    icon={<CheckCircle fontSize="inherit" />}
+                    severity="success"
+                  >
+                    Vehicle is available for the selected dates!
+                  </Alert>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={this.onReserveClick}
+                    startIcon={<ShoppingCart />}
+                  >
+                    Reserve Now
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    fullWidth
+                    onClick={this.onBuyClick}
+                    startIcon={<Store />}
+                  >
+                    Buy Now
+                  </Button>
+                </Stack>
               ) : (
-                <div className="container bg-danger rounded w-75">
-                  <div className="mt-5 text-center text-white rounded">
-                    <h3>Not Available</h3>
-                  </div>
-                </div>
+                <Alert severity="error">
+                  Sorry, this vehicle is not available for the selected dates.
+                </Alert>
               )}
-            </Fragment>
-          ) : (
-            ""
+            </Box>
           )}
-        </div>
-      </div>
+        </Paper>
+      </Box>
     );
   }
 }

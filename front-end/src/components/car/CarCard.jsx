@@ -1,94 +1,220 @@
-import React, { Fragment } from "react";
-
 import { Link, withRouter } from "react-router-dom";
 import { UserConsumer } from "../../context/UserContext";
-import util from "../../util/util";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+  Box,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Stack,
+  Chip,
+} from "@mui/material";
+import {
+  DirectionsCar,
+  Edit,
+  Delete,
+  Info,
+  ShoppingCart,
+  LocalGasStation,
+  EventSeat,
+  Weekend,
+  AttachMoney,
+} from "@mui/icons-material";
 
 const CarCard = (props) => {
-  const { user } = props;
+  const { user, car, location } = props;
+  const onReserveClick = () => {
+    const { startDate, endDate } = this.state;
+    this.props.updateDates({ startDate, endDate });
+    this.props.history.push("/cars/reserve/" + this.props.id);
+  };
 
   return (
-    <div className="card shadow rounded-lg">
-      <div className="card-horizontal ">
-        <div className="card-image m-3">
-          <img className="card-image" src={props.car.imageUrl} alt="" />
-        </div>
-        <div className="card-body table-responsive">
-          <table className="text-lg-center w-75 h-75 my-2 mx-2">
-            <tbody>
-              <tr>
-                <th>Brand</th>
-                <td>{props.car.brand}</td>
-                <th>Price</th>
-                <td>${props.car.pricePerDay}/day</td>
-                <th>Seats</th>
-                <td>{props.car.seats}</td>
-                <th>For Sale</th>
-                {props.car.forSale ? <td>Yes</td> : <td>No</td>}
-              </tr>
-              <tr>
-                <th>Model</th>
-                <td>{props.car.model}</td>
-                <th>Luggage</th>
-                <td>{props.car.trunkCapacity} l</td>
-                <th>Consumption</th>
-                <td>{props.car.litersPerHundredKilometers} l/km</td>
-                {props.car.forSale && (
+    <Card elevation={3} sx={{ mb: 3, bgcolor: "background.paper" }}>
+      <Grid container>
+        {/* Car Image */}
+        <Grid item xs={12} md={3}>
+          <CardMedia
+            component="img"
+            sx={{
+              height: "100%",
+              objectFit: "cover",
+              p: 2,
+              borderRadius: 2,
+            }}
+            image={car.imageUrl}
+            alt={`${car.brand} ${car.model}`}
+          />
+        </Grid>
+
+        {/* Car Details */}
+        <Grid item xs={12} md={7}>
+          <CardContent>
+            <Typography variant="h5" gutterBottom>
+              {car.brand} {car.model}
+            </Typography>
+
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <DirectionsCar />
+                      <Typography variant="subtitle2">Brand</Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>{car.brand}</TableCell>
+                  <TableCell>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <AttachMoney />
+                      <Typography variant="subtitle2">Price/Day</Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>${car.pricePerDay}</TableCell>
+                  <TableCell>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <EventSeat />
+                      <Typography variant="subtitle2">Seats</Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>{car.seats}</TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <TableCell>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <DirectionsCar />
+                      <Typography variant="subtitle2">Model</Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>{car.model}</TableCell>
+                  <TableCell>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Weekend />
+                      <Typography variant="subtitle2">Luggage</Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>{car.trunkCapacity} l</TableCell>
+                  <TableCell>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <LocalGasStation />
+                      <Typography variant="subtitle2">Consumption</Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>{car.litersPerHundredKilometers} l/km</TableCell>
+                </TableRow>
+
+                {car.forSale && (
+                  <TableRow>
+                    <TableCell colSpan={6}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <Chip
+                          icon={<AttachMoney />}
+                          label={`Sale Price: $${car.price}`}
+                          color="success"
+                          variant="outlined"
+                        />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Grid>
+
+        {/* Actions */}
+        <Grid item xs={12} md={2}>
+          <Box
+            sx={{
+              p: 2,
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              gap: 2,
+            }}
+          >
+            <Stack spacing={2}>
+              <Button
+                component={Link}
+                to={`/cars/details/${car.id}`}
+                variant="outlined"
+                startIcon={<Info />}
+                fullWidth
+              >
+                Details
+              </Button>
+
+              {user.role === "USER" &&
+                location.pathname === "/cars/available" && (
                   <>
-                    <th>Sale Price:</th>
-                    <td>{props.car.price} $</td>
+                    <Button
+                      component={Link}
+                      to={`/cars/reserve/${car.id}`}
+                      variant="contained"
+                      startIcon={<ShoppingCart />}
+                      fullWidth
+                    >
+                      Reserve
+                    </Button>
+                    <Button
+                      // component={Link}
+                      onClick={onReserveClick}
+                      variant="contained"
+                      color="success"
+                      startIcon={<ShoppingCart />}
+                      fullWidth
+                    >
+                      Buy
+                    </Button>
                   </>
                 )}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className="card-footer col-lg-2">
-          <div className="row my-3 justify-content-around">
-            <Link
-              className="btn btn-info col-lg-5"
-              to={"/cars/details/" + props.car.id}
-            >
-              Details
-            </Link>
-            {user.role === "USER" &&
-              props.location.pathname === "/cars/available" && (
-                <Link
-                  className="btn btn-primary col-lg-5"
-                  to={"/cars/reserve/" + props.car.id}
-                >
-                  Reserve
-                </Link>
+
+              {user.role === "ADMIN" && (
+                <>
+                  <Button
+                    component={Link}
+                    to={`/cars/edit/${car.id}`}
+                    variant="outlined"
+                    color="warning"
+                    startIcon={<Edit />}
+                    fullWidth
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    component={Link}
+                    to={`/cars/delete/${car.id}`}
+                    variant="outlined"
+                    color="error"
+                    startIcon={<Delete />}
+                    fullWidth
+                  >
+                    Delete
+                  </Button>
+                </>
               )}
-          </div>
-          <div className="row my-3 justify-content-around">
-            {user.role === "ADMIN" && (
-              <Fragment>
-                <Link
-                  className="btn btn-warning col-lg-5"
-                  to={"/cars/edit/" + props.car.id}
-                >
-                  Edit
-                </Link>
-                <Link
-                  className="btn btn-danger col-lg-5"
-                  to={"/cars/delete/" + props.car.id}
-                >
-                  Delete
-                </Link>
-              </Fragment>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+            </Stack>
+          </Box>
+        </Grid>
+      </Grid>
+    </Card>
   );
 };
 
 const CarCardWithContext = (props) => {
   return (
     <UserConsumer>
-      {({ user }) => <CarCard {...props} user={user} />}
+      {({ user }) => <CarCard {...props} user={user} car={props.car} />}
     </UserConsumer>
   );
 };
