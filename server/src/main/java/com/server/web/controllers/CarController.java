@@ -11,6 +11,8 @@ import com.server.services.CarService;
 import com.server.services.RentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
@@ -47,6 +49,15 @@ public class CarController {
     public CarViewModel editCar(@PathVariable("id") String id, @RequestBody @Valid CarCreationBindingModel model, HttpServletResponse response) throws IOException {
 
         return this.carService.editCar(id,model);
+    }
+
+    @GetMapping("/my-cars/{username}")
+    public ResponseEntity<Page<CarViewModel>> getMyOwnedCars(
+            @PathVariable String username,
+            @PageableDefault(page = 0, size = 10) Pageable pageable
+    ) {
+        Page<CarViewModel> cars = carService.allCarsOwnedByUser(pageable, username);
+        return ResponseEntity.ok(cars);
     }
 
     @PostMapping("/reserve/{id}")

@@ -13,13 +13,12 @@ public class RentViewModel {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private CarViewModel car;
-    private boolean isApproved;
-    private boolean isFinished;
+    private boolean isApproved = false;
+    private boolean finished = false;
     private Double totalPrice;
-    private boolean approved;
 
     public boolean isApproved() {
-        return approved;
+        return isApproved;
     }
 
 
@@ -67,11 +66,11 @@ public class RentViewModel {
     }
 
     public boolean getFinished() {
-        return isFinished;
+        return finished;
     }
 
     public void setFinished(boolean finished) {
-        isFinished = finished;
+        this.finished = finished;
     }
 
     public Double getTotalPrice() {

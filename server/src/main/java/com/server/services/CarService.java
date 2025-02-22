@@ -19,4 +19,5 @@ public interface CarService {
     Page<CarViewModel> allAvailableCars(Pageable pageable, WithinDatesAndUserNameModel model, String query);
     boolean checkAvailability(String id, LocalDate startDate, LocalDate endDate);
     PurchaseViewModel purchaseCar(String carId, PurchaseCarModel model) throws Exception;
+    Page<CarViewModel> allCarsOwnedByUser(Pageable pageable, String username);
 }

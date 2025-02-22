@@ -12,7 +12,7 @@ public class RentCreateBindingModel {
     private Car car;
     private User renter;
     private boolean isApproved;
-
+    private boolean finished = false; // Add this field with default value
     public RentCreateBindingModel() {
     }
 
@@ -56,5 +56,13 @@ public class RentCreateBindingModel {
 
     public void setRenter(User renter) {
         this.renter = renter;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 }

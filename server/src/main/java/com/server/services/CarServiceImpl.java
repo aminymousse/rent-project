@@ -84,6 +84,21 @@ public class CarServiceImpl implements CarService {
 
         return this.modelMapper.map(savedPurchase, PurchaseViewModel.class);
     }
+
+    @Override
+    public Page<CarViewModel> allCarsOwnedByUser(Pageable pageable, String username) {
+        // Find the user first to ensure they exist
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        // Get paginated cars owned by the user
+        Page<Car> cars = carRepository.findAllByOwner(owner, pageable);
+
+        // Map the cars to view models
+        return cars.map(car -> modelMapper.map(car, CarViewModel.class));
+    }
+
+
     @Override
     public CarViewModel getFirstById(String id) {
 

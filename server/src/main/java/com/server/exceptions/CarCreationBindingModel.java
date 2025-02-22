@@ -1,16 +1,9 @@
 package com.server.exceptions;
 
 import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 public class CarCreationBindingModel {
-
-
-
     private String brand;
     private String model;
     private Integer trunkCapacity;
@@ -27,8 +20,8 @@ public class CarCreationBindingModel {
     public CarCreationBindingModel() {
     }
 
-
-    @Length(min=3,max = 15)
+    @NotNull
+    @Length(min=3, max=15)
     public String getBrand() {
         return brand;
     }
@@ -37,8 +30,8 @@ public class CarCreationBindingModel {
         this.brand = brand;
     }
 
-
-    @Length(min=1,max = 15)
+    @NotNull
+    @Length(min=1, max=15)
     public String getModel() {
         return model;
     }
@@ -47,6 +40,7 @@ public class CarCreationBindingModel {
         this.model = model;
     }
 
+    @NotNull
     @Length(min=10, max=500)
     public String getDescription() {
         return description;
@@ -86,8 +80,8 @@ public class CarCreationBindingModel {
         this.year = year;
     }
 
-    @NotEmpty
-    @Length(min = 14)
+    @NotNull
+    @Length(min=14)
     public String getImageUrl() {
         return imageUrl;
     }
@@ -106,7 +100,7 @@ public class CarCreationBindingModel {
         this.litersPerHundredKilometers = litersPerHundredKilometers;
     }
 
-    @NotNull
+    // Remove @NotNull from pricePerDay since it's conditional
     @DecimalMin("0.1")
     public Double getPricePerDay() {
         return pricePerDay;
@@ -125,13 +119,23 @@ public class CarCreationBindingModel {
         isForSale = forSale;
     }
 
-    @NotNull
+    @DecimalMin("0.1")
     public Double getPrice() {
         return price;
     }
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    // Add custom validation method
+    @AssertTrue(message = "Either price or pricePerDay must be set based on forSale flag")
+    private boolean isPricingValid() {
+        if (isForSale) {
+            return price != null && price > 0 && pricePerDay == null;
+        } else {
+            return pricePerDay != null && pricePerDay > 0 && price == null;
+        }
     }
 
     @NotNull

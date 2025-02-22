@@ -55,6 +55,7 @@ public class RentServiceImpl implements RentService {
 
         rentModel.setApproved(false);
         rentModel.setRenter(user);
+        rentModel.setFinished(false);
         rentModel.setCar(car);
 
         Rent rent = this.modelMapper.map(rentModel, Rent.class);
@@ -67,7 +68,7 @@ public class RentServiceImpl implements RentService {
     public Page<RentViewModel> allUnapprovedRents(Pageable pageable) {
         // Update to use the new method name if you changed it
         return PageMapper.mapPage(
-                this.rentRepository.findAllByIsApproved(pageable, false),
+                this.rentRepository.findAllByApproved(pageable, false),
                 RentViewModel.class,
                 modelMapper
         );

@@ -1,5 +1,6 @@
 package com.server.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ public class User extends BaseEntity implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "authority_id")
     )
+    @JsonIgnoreProperties("users")
     private Set<UserRole> authorities = new HashSet<>();
 
     @OneToMany(mappedBy = "renter", cascade = CascadeType.ALL, orphanRemoval = true)

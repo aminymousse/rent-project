@@ -23,10 +23,11 @@ public class Rent extends BaseEntity {
     private LocalDate endDate;
 
     @Column(name = "is_approved", nullable = false)
-    private Boolean isApproved = false;
+    private Boolean approved = false;
 
-    @Column(name = "is_finished", nullable = false)
-    private Boolean isFinished = false;
+    @Column(name = "is_finished")
+    private Boolean finished = false;
+
 
     public Rent() {
     }
@@ -65,20 +66,21 @@ public class Rent extends BaseEntity {
     }
 
     public Boolean getApproved() {
-        return isApproved;
+        return approved;
     }
 
     public void setApproved(Boolean approved) {
-        isApproved = approved;
+        this.approved = approved;
     }
 
     public Boolean getFinished() {
-        return isFinished;
+        return finished;
     }
 
     public void setFinished(Boolean finished) {
-        isFinished = finished;
+        this.finished = finished;
     }
+
 
     // Calculate rental price
     public Double calculatePrice() {
