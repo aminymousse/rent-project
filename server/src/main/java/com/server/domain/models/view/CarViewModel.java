@@ -1,5 +1,7 @@
 package com.server.domain.models.view;
 
+import com.server.domain.entities.User;
+
 public class CarViewModel {
 
     private String id;
@@ -16,6 +18,7 @@ public class CarViewModel {
     private boolean isRented;
     private boolean isForSale;
     private Double price;
+    private User owner;
 
     public CarViewModel() {
     }
@@ -130,6 +133,14 @@ public class CarViewModel {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
 }

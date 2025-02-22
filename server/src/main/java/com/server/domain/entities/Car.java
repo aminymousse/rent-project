@@ -2,15 +2,20 @@ package com.server.domain.entities;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
 @Entity
 @Table(name = "cars")
-public class Car extends BaseEntity{
+public class Car extends BaseEntity {
 
+    @Column(nullable = false)
     private String brand;
+
+    @Column(nullable = false)
     private String model;
+
     private Integer trunkCapacity;
     private String description;
     private Integer year;
@@ -19,13 +24,52 @@ public class Car extends BaseEntity{
     private Double litersPerHundredKilometers;
     private Double pricePerDay;
     private Integer count;
-    private Set<Rent> activeRents;
     private boolean isForSale;
+    @Column(nullable = true)
     private Double price;
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
+    private User owner;
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Rent> activeRents = new ArrayList<>();
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Purchase> purchases = new ArrayList<>();
+
     public Car() {
-        this.activeRents = new HashSet<>();
+        this.activeRents = new ArrayList<>();
+        this.purchases = new ArrayList<>();
     }
+
+    // Getters and Setters
+    public List<Rent> getActiveRents() {
+        return activeRents;
+    }
+
+    public void setActiveRents(List<Rent> activeRents) {
+        this.activeRents = activeRents;
+    }
+
+    public List<Purchase> getPurchases() {
+        return purchases;
+    }
+
+    public void setPurchases(List<Purchase> purchases) {
+        this.purchases = purchases;
+    }
+
+    public void addPurchase(Purchase purchase) {
+        purchases.add(purchase);
+        purchase.setCar(this);
+    }
+
+    public void removePurchase(Purchase purchase) {
+        purchases.remove(purchase);
+        purchase.setCar(null);
+    }
+
 
     @Column(nullable = false)
     public String getBrand() {
@@ -118,14 +162,6 @@ public class Car extends BaseEntity{
         this.count = count;
     }
 
-    @OneToMany
-    public Set<Rent> getActiveRents() {
-        return activeRents;
-    }
-
-    public void setActiveRents(Set<Rent> activeRents) {
-        this.activeRents = activeRents;
-    }
 
     @Column(nullable = false)
     public boolean isForSale() {
@@ -143,6 +179,15 @@ public class Car extends BaseEntity{
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    @ManyToOne
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
     }
 
     public boolean isAvailable(LocalDate startDate, LocalDate endDate){

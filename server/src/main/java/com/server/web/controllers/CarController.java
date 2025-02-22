@@ -1,6 +1,8 @@
 package com.server.web.controllers;
 
 import com.server.domain.entities.ResponseBody;
+import com.server.domain.models.binding.PurchaseCarModel;
+import com.server.domain.models.view.PurchaseViewModel;
 import com.server.exceptions.CarCreationBindingModel;
 import com.server.domain.models.view.CarViewModel;
 import com.server.domain.models.binding.WithinDatesAndUserNameModel;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -70,7 +73,23 @@ public class CarController {
 
         return this.carService.allCars(pageable, query);
     }
-
+    @PostMapping("/purchase/{id}")
+    public ResponseBody purchaseCar(@PathVariable String id, @RequestBody @Valid PurchaseCarModel model) {
+        ResponseBody responseBody = new ResponseBody();
+        try {
+            PurchaseViewModel purchase = carService.purchaseCar(id, model);
+            responseBody.setMessage("Car purchased successfully!");
+            responseBody.setEntity(purchase);
+            responseBody.setSuccess(true);
+        } catch (EntityNotFoundException | IllegalStateException e) {
+            responseBody.setMessage(e.getMessage());
+            responseBody.setSuccess(false);
+        } catch (Exception e) {
+            responseBody.setMessage("An error occurred while processing the purchase");
+            responseBody.setSuccess(false);
+        }
+        return responseBody;
+    }
     @PostMapping("/available")
     public Page<CarViewModel> availableCars(Pageable pageable,
                                             @RequestBody @Valid WithinDatesAndUserNameModel model,

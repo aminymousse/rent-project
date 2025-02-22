@@ -1,18 +1,27 @@
 package com.server.domain.models.view;
 
 import com.server.domain.models.view.CarViewModel;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 
 public class RentViewModel {
 
     private String id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private CarViewModel car;
     private boolean isApproved;
     private boolean isFinished;
     private Double totalPrice;
+    private boolean approved;
+
+    public boolean isApproved() {
+        return approved;
+    }
+
 
     public RentViewModel() {
     }

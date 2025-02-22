@@ -13,7 +13,10 @@ public class Sale extends BaseEntity {
     private String carModel;
     private LocalDate startDate;
     private LocalDate endDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_id", referencedColumnName = "id", nullable = false)
     private User buyer;
+
     private LocalDate issueDate;
     private Double pricePaid;
     private SaleType type;
@@ -58,7 +61,8 @@ public class Sale extends BaseEntity {
         this.endDate = endDate;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "buyer_id")  // Specify the column name for the foreign key
     public User getBuyer() {
         return buyer;
     }

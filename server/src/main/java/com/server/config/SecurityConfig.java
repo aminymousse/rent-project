@@ -59,7 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                     .antMatchers("/cars/all", "/cars/**").permitAll()
-                    .antMatchers( "/login", "/users/register").anonymous()
+                    .antMatchers( "/login", "/users/register").permitAll()
                     .antMatchers("/sales/all/**","/cars/reserve/**","/cars/available").hasAuthority("USER")
                     .antMatchers("/rents/active","/rents/pending","/cars/edit/**","/cars/delete/:id","/cars/create").hasAuthority("ADMIN")
                     .anyRequest().authenticated()

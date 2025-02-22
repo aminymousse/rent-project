@@ -12,6 +12,8 @@ import java.util.List;
 
 @Repository
 public interface RentRepository extends JpaRepository<Rent, String> {
+    Page<Rent> findAllByIsApproved(Pageable pageable, boolean approved);
+
     Page<Rent> findAllByApproved(Pageable pageable, boolean approved);
     Page<Rent> findAllByFinishedAndApproved(Pageable pageable,boolean finished, boolean approved);
     List<Rent> findAllByCar(Car car);

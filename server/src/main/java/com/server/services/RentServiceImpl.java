@@ -65,7 +65,12 @@ public class RentServiceImpl implements RentService {
 
     @Override
     public Page<RentViewModel> allUnapprovedRents(Pageable pageable) {
-        return PageMapper.mapPage(this.rentRepository.findAllByApproved(pageable,false),RentViewModel.class,modelMapper);
+        // Update to use the new method name if you changed it
+        return PageMapper.mapPage(
+                this.rentRepository.findAllByIsApproved(pageable, false),
+                RentViewModel.class,
+                modelMapper
+        );
     }
 
     @Override
@@ -80,6 +85,7 @@ public class RentServiceImpl implements RentService {
 
     @Override
     public boolean approveRent(String id) {
+
         Rent rent = this.rentRepository.getOne(id);
         if(rent.getId() == null){
             throw new RentNotFoundException();

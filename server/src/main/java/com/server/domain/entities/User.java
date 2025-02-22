@@ -1,90 +1,61 @@
 package com.server.domain.entities;
 
 import org.springframework.security.core.userdetails.UserDetails;
-
-
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
 
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity implements UserDetails {
 
+    @Column(unique = true, nullable = false)
     private String username;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
-    private Set<UserRole> authorities;
-    private Set<Rent> rents;
-    private Set<Sale> sales;
-    private boolean isAccountNonExpired;
-    private boolean isAccountNonLocked;
-    private boolean isCredentialsNonExpired;
-    private boolean isEnabled;
 
-
-
-    public User() {
-        this.authorities = new HashSet<>();
-        this.rents = new HashSet<>();
-        this.sales = new HashSet<>();
-    }
-
-    @Override
-    public String getPassword() {
-        return this.password;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @Override
-    @Column(unique = true, nullable = false)
-    public String getUsername() {
-        return this.username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Column(unique = true, nullable = false)
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @OneToMany(mappedBy = "renter")
-    public Set<Rent> getRents() {
-        return rents;
-    }
-
-    public void setRents(Set<Rent> rents) {
-        this.rents = rents;
-    }
-
-    @OneToMany(mappedBy = "buyer")
-    public Set<Sale> getSales() {
-        return sales;
-    }
-
-    public void setSales(Set<Sale> sales) {
-        this.sales = sales;
-    }
-
-    @Override
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_authorities",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "authority_id")
     )
+    private Set<UserRole> authorities = new HashSet<>();
+
+    @OneToMany(mappedBy = "renter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Rent> rents = new HashSet<>();
+
+    @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Sale> sales = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Purchase> purchases;
+
+    @Column(nullable = false)
+    private boolean isAccountNonExpired = true;
+
+    @Column(nullable = false)
+    private boolean isAccountNonLocked = true;
+
+    @Column(nullable = false)
+    private boolean isCredentialsNonExpired = true;
+
+    @Column(nullable = false)
+    private boolean isEnabled = true;
+
+    public User() {
+        this.purchases = new java.util.ArrayList<>();
+    }
+
+    // Getters and Setters
+
+    @Override
     public Set<UserRole> getAuthorities() {
-        return this.authorities;
+        return authorities;
     }
 
     public void setAuthorities(Set<UserRole> authorities) {
@@ -92,38 +63,60 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.username;
+    }
+
+    @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return isAccountNonExpired;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return isAccountNonLocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return isCredentialsNonExpired;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setAccountNonExpired(boolean accountNonExpired) {
-        isAccountNonExpired = accountNonExpired;
+        this.isAccountNonExpired = accountNonExpired;
     }
 
     public void setAccountNonLocked(boolean accountNonLocked) {
-        isAccountNonLocked = accountNonLocked;
+        this.isAccountNonLocked = accountNonLocked;
     }
 
     public void setCredentialsNonExpired(boolean credentialsNonExpired) {
-        isCredentialsNonExpired = credentialsNonExpired;
+        this.isCredentialsNonExpired = credentialsNonExpired;
     }
 
     public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+        this.isEnabled = enabled;
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -33,48 +32,50 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-
-        return this.userRepository.getFirstByUsername(s);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return this.userRepository.getFirstByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
-
 
     @Override
     public boolean register(UserRegisterBindingModel model) {
-
         validateRegisterModel(model);
 
         model.setPassword(encoder.encode(model.getPassword()));
-        User user = this.modelMapper.map(model,User.class);
+        User user = this.modelMapper.map(model, User.class);
 
         UserRole role = setRole();
-
         user.getAuthorities().add(role);
 
         User returnedUser = this.userRepository.saveAndFlush(user);
-
-        return this.modelMapper.map(returnedUser,UserRegisterBindingModel.class) != null;
+        return this.modelMapper.map(returnedUser, UserRegisterBindingModel.class) != null;
     }
 
-    private UserRole setRole(){
+    private UserRole setRole() {
         UserRole role;
-
-        if(this.userRepository.findAll().size() == 0){
+        if(this.userRepository.findAll().size() == 0) {
             role = this.roleRepository.getFirstByAuthority("ADMIN");
         } else {
             role = this.roleRepository.getFirstByAuthority("USER");
         }
-
         return role;
     }
 
-    private void validateRegisterModel(UserRegisterBindingModel model){
-        if(this.loadUserByUsername(model.getUsername()) != null){
+    private void validateRegisterModel(UserRegisterBindingModel model) {
+        try {
+            // Try to load user by username - if no exception is thrown, user exists
+            loadUserByUsername(model.getUsername());
+            // If we get here, user was found
             throw new UsernameAlreadyTaken();
+        } catch (UsernameNotFoundException ignored) {
+            // Username is available
         }
 
-        if(this.userRepository.getFirstByEmail(model.getEmail()) != null){
+        // Check if email exists
+        User existingUserWithEmail = this.userRepository.getFirstByEmail(model.getEmail());
+        if(existingUserWithEmail != null) {
             throw new EmailAlreadyTakenException();
         }
     }
 }
+

@@ -1,5 +1,7 @@
 package com.server.services;
 
+import com.server.domain.models.binding.PurchaseCarModel;
+import com.server.domain.models.view.PurchaseViewModel;
 import com.server.exceptions.CarCreationBindingModel;
 import com.server.domain.models.view.CarViewModel;
 import com.server.domain.models.binding.WithinDatesAndUserNameModel;
@@ -16,4 +18,5 @@ public interface CarService {
     Page<CarViewModel> allCars(Pageable pageable, String query);
     Page<CarViewModel> allAvailableCars(Pageable pageable, WithinDatesAndUserNameModel model, String query);
     boolean checkAvailability(String id, LocalDate startDate, LocalDate endDate);
+    PurchaseViewModel purchaseCar(String carId, PurchaseCarModel model) throws Exception;
 }

@@ -1,25 +1,37 @@
 package com.server.domain.entities;
 
-
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-
 @Entity
 @Table(name = "rents")
 public class Rent extends BaseEntity {
+
+    @ManyToOne
+    @JoinColumn(name = "car_id", referencedColumnName = "id", nullable = false)
     private Car car;
+
+    @ManyToOne
+    @JoinColumn(name = "renter_id", referencedColumnName = "id", nullable = false)
     private User renter;
+
+    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
-    private boolean isApproved;
-    private boolean isFinished;
+
+    @Column(name = "is_approved", nullable = false)
+    private Boolean isApproved = false;
+
+    @Column(name = "is_finished", nullable = false)
+    private Boolean isFinished = false;
 
     public Rent() {
     }
 
-    @ManyToOne
+    // Getters & Setters
     public Car getCar() {
         return car;
     }
@@ -28,7 +40,6 @@ public class Rent extends BaseEntity {
         this.car = car;
     }
 
-    @ManyToOne
     public User getRenter() {
         return renter;
     }
@@ -37,7 +48,6 @@ public class Rent extends BaseEntity {
         this.renter = renter;
     }
 
-    @Column(nullable = false)
     public LocalDate getStartDate() {
         return startDate;
     }
@@ -46,7 +56,6 @@ public class Rent extends BaseEntity {
         this.startDate = startDate;
     }
 
-    @Column(nullable = false)
     public LocalDate getEndDate() {
         return endDate;
     }
@@ -55,27 +64,25 @@ public class Rent extends BaseEntity {
         this.endDate = endDate;
     }
 
-    public Double calculatePrice(){
-
-        long days = ChronoUnit.DAYS.between(this.getStartDate(),this.getEndDate()) + 1;
-
-        return days * this.getCar().getPricePerDay();
-    }
-
-    @Column(nullable = false)
-    public boolean getApproved() {
+    public Boolean getApproved() {
         return isApproved;
     }
 
-    public void setApproved(boolean approved) {
+    public void setApproved(Boolean approved) {
         isApproved = approved;
     }
 
-    public boolean getFinished() {
+    public Boolean getFinished() {
         return isFinished;
     }
 
-    public void setFinished(boolean finished) {
+    public void setFinished(Boolean finished) {
         isFinished = finished;
+    }
+
+    // Calculate rental price
+    public Double calculatePrice() {
+        long days = ChronoUnit.DAYS.between(this.startDate, this.endDate) + 1;
+        return days * (this.car != null ? this.car.getPricePerDay() : 0.0);
     }
 }
